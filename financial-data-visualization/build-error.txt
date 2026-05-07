@@ -1,0 +1,20 @@
+$ next build
+   鈻?Next.js 15.0.4
+   - Environments: .env
+
+   Creating an optimized production build ...
+ 鉁?Compiled successfully
+   Linting and checking validity of types ...
+Failed to compile.
+
+./src/server/utils/spread.util.ts:10:10
+Type error: Module '"drizzle-typebox"' has no exported member 'BuildInsertSchema'.
+
+   8 |     createInsertSchema,
+   9 |     createSelectSchema,
+> 10 |     type BuildInsertSchema,
+     |          ^
+  11 |     type BuildSelectSchema,
+  12 | } from "drizzle-typebox";
+  13 |
+error: script "build" exited with code 1

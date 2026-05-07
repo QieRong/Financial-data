@@ -1,0 +1,15 @@
+# 后端 Python 依赖和环境
+report_api/.venv/
+report_api/__pycache__/
+report_api/*.pyc
+report_api/.idea/
+report_api/uv.lock
+
+# 依赖锁文件（如果不需要版本跟踪也可以忽略）
+# report_api/uv.lock
+
+# 前端/通用
+node_modules/
+.env
+*.log
+.DS_Store

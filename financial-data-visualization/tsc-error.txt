@@ -1,0 +1,2 @@
+src/server/utils/spread.util.ts(10,10): error TS2305: Module '"drizzle-typebox"' has no exported member 'BuildInsertSchema'.
+src/server/utils/spread.util.ts(11,10): error TS2305: Module '"drizzle-typebox"' has no exported member 'BuildSelectSchema'.
