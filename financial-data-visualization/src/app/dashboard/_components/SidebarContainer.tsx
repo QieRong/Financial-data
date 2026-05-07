@@ -353,12 +353,14 @@ const fetchStockInfo = async (stockCode: string): Promise<StockInfo> => {
         }
 
         const data = await response.json();
+        if (data.name === "查询失败") {
+            throw new Error("Stock name lookup failed");
+        }
         return {
-            code: data.code,
+            code: String(data.code ?? stockCode).replace(/\D/g, ""),
             name: data.name,
         };
     } catch (error) {
-        console.error("获取股票信息错误:", error);
         throw error;
     }
 };
@@ -415,6 +417,12 @@ function toMutableNavItems(items: readonly any[]): NavItem[] {
     }));
 }
 
+function getStockCodeFromSearchParams(params: {
+    get(name: string): string | null;
+}) {
+    return params.get("stock")?.replace(/\D/g, "") || "600519";
+}
+
 export default function SidebarContainer({
     children,
 }: {
@@ -452,7 +460,29 @@ export default function SidebarContainer({
         setCurrentNavData(toMutableNavItems(newData));
     }, [reportType]);
 
-    const [stockCode, setStockCode] = React.useState("600519"); // 默认股票代码改为纯数字
+    const stockCodeFromUrl = getStockCodeFromSearchParams(searchParams);
+    const [stockCode, setStockCode] = React.useState(stockCodeFromUrl);
+
+    React.useEffect(() => {
+        if (stockCodeFromUrl.length === 6) {
+            setStockCode(stockCodeFromUrl);
+        }
+    }, [stockCodeFromUrl]);
+
+    const routeWithStock = React.useCallback(
+        (url: string, nextStockCode = stockCode) => {
+            const newParams = new URLSearchParams(searchParams.toString());
+            const normalizedStockCode = nextStockCode.replace(/\D/g, "");
+
+            if (normalizedStockCode.length === 6) {
+                newParams.set("stock", normalizedStockCode);
+            }
+
+            const query = newParams.toString();
+            return asRoute(query ? `${url}?${query}` : url);
+        },
+        [searchParams, stockCode]
+    );
 
     // 使用 useQuery 获取股票信息
     const {
@@ -464,8 +494,9 @@ export default function SidebarContainer({
         queryKey: ["stockInfo", stockCode],
         queryFn: () => fetchStockInfo(stockCode),
         staleTime: 5 * 60 * 1000,
-        refetchOnWindowFocus: false,
-        retry: 1, // 失败时只重试一次
+        refetchOnWindowFocus: true,
+        refetchOnReconnect: true,
+        retry: 3,
         enabled: stockCode.length === 6, // 只在股票代码长度为6时才查询
     });
 
@@ -482,10 +513,10 @@ export default function SidebarContainer({
                 item: item.title,
                 subItem: firstSubItem.title,
             });
-            router.push(asRoute(firstSubItem.url));
+            router.push(routeWithStock(firstSubItem.url));
         } else {
             // 如果是子菜单项，直接导航
-            router.push(asRoute(url));
+            router.push(routeWithStock(url));
         }
     };
 
@@ -508,9 +539,9 @@ export default function SidebarContainer({
             });
 
             // 导航到目标路径
-            router.push(asRoute(firstSubItem.url));
+            router.push(routeWithStock(firstSubItem.url));
         }
-    }, [pathname, router]);
+    }, [pathname, routeWithStock, router]);
 
     const handleTeamChange = (team: (typeof teams)[0]) => {
         setActiveTeam(team);
@@ -531,12 +562,12 @@ export default function SidebarContainer({
             });
 
             // 导航到第一个子项
-            router.push(asRoute(firstSubItem.url));
+            router.push(routeWithStock(firstSubItem.url));
         }
     };
 
     const renderLink = (url: string, children: React.ReactNode) => (
-        <Link href={url as unknown as URL}>{children}</Link>
+        <Link href={routeWithStock(url) as unknown as URL}>{children}</Link>
     );
 
     return (
@@ -605,7 +636,9 @@ export default function SidebarContainer({
 
                                                 // 导航到第一个子项
                                                 router.push(
-                                                    asRoute(firstSubItem.url)
+                                                    routeWithStock(
+                                                        firstSubItem.url
+                                                    )
                                                 );
                                             }}
                                             className="gap-2 p-2"
@@ -670,7 +703,7 @@ export default function SidebarContainer({
                                                                     // Start of Selection
                                                                 >
                                                                     <Link
-                                                                        href={asRoute(
+                                                                        href={routeWithStock(
                                                                             subItem.url
                                                                         )}
                                                                         onClick={(
@@ -850,7 +883,7 @@ export default function SidebarContainer({
 
                                                         // 导航到第一个子项
                                                         router.push(
-                                                            asRoute(
+                                                            routeWithStock(
                                                                 firstSubItem.url
                                                             )
                                                         );
@@ -893,7 +926,7 @@ export default function SidebarContainer({
                                                                 }
                                                             );
                                                             router.push(
-                                                                asRoute(
+                                                                routeWithStock(
                                                                     firstSubItem.url
                                                                 )
                                                             );
@@ -945,7 +978,7 @@ export default function SidebarContainer({
                                                                             }
                                                                         );
                                                                         router.push(
-                                                                            asRoute(
+                                                                            routeWithStock(
                                                                                 subItem.url
                                                                             )
                                                                         );
@@ -983,13 +1016,11 @@ export default function SidebarContainer({
                                     e.key === "Enter" &&
                                     stockCode.length === 6
                                 ) {
-                                    const currentPath = pathname;
-                                    const newParams = new URLSearchParams(
-                                        searchParams.toString()
-                                    );
-                                    newParams.set("stock", stockCode);
                                     router.push(
-                                        `${currentPath}?${newParams.toString()}` as any
+                                        routeWithStock(
+                                            pathname,
+                                            stockCode
+                                        ) as any
                                     );
                                 }
                             }}
@@ -1001,10 +1032,10 @@ export default function SidebarContainer({
                         )}
                         {isError && (
                             <span className="text-sm text-red-500">
-                                获取股票信息失败
+                                查询失败 ({stockCode})
                             </span>
                         )}
-                        {stockInfo && (
+                        {!isError && stockInfo && (
                             <div className="text-sm">
                                 <span className="font-medium">
                                     {stockInfo.name}

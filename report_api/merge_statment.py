@@ -40,6 +40,14 @@ def calculate_financial_ratios(
         process_balance_statement(stock_code, adjusted_start_date_str, end_date)
     )
 
+    statement_frames = [
+        income_statement_data,
+        cash_flow_statement_data,
+        balance_statement_data,
+    ]
+    if any(df.empty or "报告日期" not in df.columns for df in statement_frames):
+        return pd.DataFrame()
+
     # 合并数据
     merged_data = income_statement_data.merge(
         cash_flow_statement_data, on="报告日期", how="outer"
@@ -355,7 +363,7 @@ def calculate_financial_ratios(
         analysis_data = add_growth_metrics(analysis_data, "report_period")
     elif aggregation == "quarterly":
         # 进行季度数据聚合
-        analysis_data = aggregate_quarterly_data(analysis_data)
+        analysis_data = aggregate_quarterly_data(analysis_data, report_type)
     elif aggregation == "yearly":
         # 进行年度数据聚合
         analysis_data = aggregate_yearly_data(analysis_data)
@@ -467,7 +475,14 @@ def aggregate_yearly_data(data: pd.DataFrame) -> pd.DataFrame:
     return yearly_data
 
 
-def aggregate_quarterly_data(data: pd.DataFrame) -> pd.DataFrame:
+def is_ratio_column(column_name: str) -> bool:
+    """Return True for ratio/multiple columns that should not be differenced."""
+    ratio_markers = ("率", "占")
+    ratio_columns = {"ROE", "杠杆系数", "权益乘数", "现金债务比", "扩展现金债务比"}
+    return column_name in ratio_columns or any(marker in column_name for marker in ratio_markers)
+
+
+def aggregate_quarterly_data(data: pd.DataFrame, report_type: str) -> pd.DataFrame:
     """
     Aggregate data by quarter, calculate differences between quarters, format dates,
     and add both sequential (环比) and year-over-year (同比) growth metrics.
@@ -481,21 +496,33 @@ def aggregate_quarterly_data(data: pd.DataFrame) -> pd.DataFrame:
     # 确保 '报告日期' 是 datetime 类型
     data["报告日期"] = pd.to_datetime(data["报告日期"])
 
-    # 按日期升序排序，以便正确计算差分
+    # 按日期升序排序，以便正确计算季度数据
     data_sorted = data.sort_values(by="报告日期", ascending=True).reset_index(drop=True)
+    data_sorted["报告日期"] = data_sorted["报告日期"].dt.to_period("Q").astype(str)
+
+    if report_type == "balance":
+        quarterly_data = (
+            data_sorted.groupby("报告日期", as_index=False).last()
+            .sort_values(by="报告日期", ascending=False)
+            .reset_index(drop=True)
+        )
+        return add_quarterly_growth_metrics(quarterly_data)
 
     # 分离日期列和数值列
     date_column = data_sorted["报告日期"]
     numeric_data = data_sorted.drop(columns=["报告日期"])
 
-    # 计算当前季度与前一季度的差值（仅对数值列）
-    diff_data = numeric_data.diff().dropna()
+    # 利润表和现金流量表通常是累计口径：金额类字段做本季差分，
+    # 比率/倍数字段保留当期比率，避免对比率本身做差分后再计算增长率。
+    ratio_columns = [col for col in numeric_data.columns if is_ratio_column(col)]
+    amount_columns = [col for col in numeric_data.columns if col not in ratio_columns]
+    diff_data = numeric_data.copy()
+    if amount_columns:
+        diff_data[amount_columns] = numeric_data[amount_columns].diff()
+    diff_data = diff_data.iloc[1:].copy()
 
     # 将当前季度的日期添加回差分数据
     diff_data["报告日期"] = date_column.iloc[1:].values
-
-    # 将 '报告日期' 转换为 'YYYYQx' 格式的字符串
-    diff_data["报告日期"] = diff_data["报告日期"].dt.to_period("Q").astype(str)
 
     # 按报告日期降序排序，以保持与原始报告期一致的顺序
     diff_data = diff_data.sort_values(by="报告日期", ascending=False).reset_index(

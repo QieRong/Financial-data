@@ -74,7 +74,8 @@ export const FinanceService = new Elysia({ name: "finance.service" })
 
             async getReportsByCodeAndperiodType(
                 code: string,
-                periodType: "period" | "quarterly" | "yearly"
+                periodType: "period" | "quarterly" | "yearly",
+                typeId: number
             ) {
                 return await db()
                     .select()
@@ -82,7 +83,8 @@ export const FinanceService = new Elysia({ name: "finance.service" })
                     .where(
                         and(
                             eq(table.report.stockCode, code),
-                            eq(table.report.periodType, periodType)
+                            eq(table.report.periodType, periodType),
+                            eq(table.report.typeId, typeId)
                         )
                     );
             },
@@ -134,11 +136,13 @@ export const FinanceService = new Elysia({ name: "finance.service" })
             // 定义响应格式接口
             async getReportsByCodeAndperiodType(
                 stockCode: string,
-                periodType: "period" | "quarterly" | "yearly"
+                periodType: "period" | "quarterly" | "yearly",
+                typeId: number
             ) {
                 return await FinanceRepo.getReportsByCodeAndperiodType(
                     stockCode,
-                    periodType
+                    periodType,
+                    typeId
                 );
             },
 
@@ -148,16 +152,37 @@ export const FinanceService = new Elysia({ name: "finance.service" })
                 reportType: string
             ): Promise<any> {
                 try {
+                    const reportTypes = await FinanceRepo.getAllReportTypes();
+                    const typeInfo = reportTypes.find(
+                        (type) => type.typeName === reportType
+                    );
+
+                    if (!typeInfo) {
+                        set.status = 404;
+                        return {
+                            success: false,
+                            data: null,
+                            message: "Report type not found",
+                        };
+                    }
+
                     // 再查询数据库中是否已有该股票的数据
                     let dbData =
                         await FinanceRepo.getReportsByCodeAndperiodType(
                             stockCode,
-                            periodType
+                            periodType,
+                            typeInfo.id
                         );
 
                     if (dbData.length === 0) {
                         // 如果数据库中没有数据，从API获取
-                        const statmentUrl = `/api/report/${reportType}/${periodType}/${stockCode}`;
+                        const reportApiBaseUrl =
+                            process.env.REPORT_API_BASE_URL ??
+                            "http://127.0.0.1:8000";
+                        const statmentUrl = new URL(
+                            `/api/report/${reportType}/${periodType}/${stockCode}`,
+                            reportApiBaseUrl
+                        ).toString();
 
                         try {
                             const response = await fetch(statmentUrl);
@@ -172,19 +197,15 @@ export const FinanceService = new Elysia({ name: "finance.service" })
 
                             const statment = await response.json();
 
-                            // 查询reportType对应的typeId
-                            const reportTypes =
-                                await FinanceRepo.getAllReportTypes();
-                            const typeInfo = reportTypes.find(
-                                (type) => type.typeName === reportType
-                            );
-
-                            if (!typeInfo) {
+                            if (
+                                !Array.isArray(statment) ||
+                                statment.length === 0
+                            ) {
                                 set.status = 404;
                                 return {
                                     success: false,
                                     data: null,
-                                    message: "Report type not found",
+                                    message: "No report data returned from API",
                                 };
                             }
 

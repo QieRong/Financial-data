@@ -7,8 +7,6 @@ import { Kind, type TObject } from "@sinclair/typebox";
 import {
     createInsertSchema,
     createSelectSchema,
-    type BuildInsertSchema,
-    type BuildSelectSchema,
 } from "drizzle-typebox";
 
 import type { Table } from "drizzle-orm";
@@ -21,11 +19,7 @@ type Spread<
           [K in keyof Fields]: Fields[K];
       }
     : T extends Table
-    ? Mode extends "select"
-        ? BuildSelectSchema<T, {}>
-        : Mode extends "insert"
-        ? BuildInsertSchema<T, {}>
-        : {}
+    ? Record<string, unknown>
     : {};
 
 /**

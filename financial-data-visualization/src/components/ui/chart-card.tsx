@@ -10,6 +10,11 @@ import {
     ResponsiveContainer,
 } from "recharts";
 import { DataSummary } from "./data-summary";
+import {
+    formatAmountByUnit,
+    formatNumber,
+    formatPercentRatio,
+} from "./chart-format";
 
 interface ChartCardProps {
     data: Array<{
@@ -20,7 +25,7 @@ interface ChartCardProps {
     }>;
     isPercentage?: boolean;
     isAmount?: boolean;
-    unit?: "亿" | "万";
+    unit?: "亿" | "万" | "次" | "倍";
     invertColors?: boolean;
     showMoM?: boolean;
     rotateLabel?: boolean;
@@ -35,22 +40,18 @@ export function ChartCard({
     showMoM = true,
     rotateLabel = false,
 }: ChartCardProps) {
-    const formatValue = (value: number) => {
-        if (unit === "亿") {
-            return `${(value / 100000000).toFixed(2)}亿`;
-        } else if (unit === "万") {
-            return `${(value / 10000).toFixed(2)}万`;
-        }
-        return value.toFixed(2);
-    };
-
     return (
         <div className="space-y-2">
             <div className="w-full h-[400px] relative">
                 <ResponsiveContainer width="100%" height="100%">
                     <ComposedChart
                         data={data}
-                        margin={{ top: 20, right: 30, left: 50, bottom: rotateLabel ? 50 : 30 }}
+                        margin={{
+                            top: 20,
+                            right: 30,
+                            left: 50,
+                            bottom: rotateLabel ? 50 : 30,
+                        }}
                     >
                         <CartesianGrid strokeDasharray="3 3" />
                         <XAxis
@@ -68,8 +69,14 @@ export function ChartCard({
                                             y={0}
                                             dy={rotateLabel ? 0 : 10}
                                             dx={rotateLabel ? -10 : 0}
-                                            textAnchor={rotateLabel ? "end" : "middle"}
-                                            transform={rotateLabel ? "rotate(-45)" : undefined}
+                                            textAnchor={
+                                                rotateLabel ? "end" : "middle"
+                                            }
+                                            transform={
+                                                rotateLabel
+                                                    ? "rotate(-45)"
+                                                    : undefined
+                                            }
                                             fontSize={12}
                                         >
                                             {payload.value}
@@ -85,7 +92,11 @@ export function ChartCard({
                             label={{
                                 value: isAmount
                                     ? "金额" + (unit ? `(${unit})` : "")
-                                    : "比率",
+                                    : unit
+                                      ? `数值(${unit})`
+                                      : isPercentage
+                                        ? "比率"
+                                        : "数值",
                                 angle: -90,
                                 position: "insideLeft",
                                 style: { textAnchor: "middle" },
@@ -93,9 +104,10 @@ export function ChartCard({
                             }}
                             tickFormatter={
                                 isPercentage
-                                    ? (value) => `${value.toFixed(2)}%`
+                                    ? (value) => formatPercentRatio(value)
                                     : unit
-                                    ? (value) => formatValue(value)
+                                    ? (value) =>
+                                          formatAmountByUnit(value, unit)
                                     : undefined
                             }
                         />
@@ -104,6 +116,7 @@ export function ChartCard({
                             orientation="right"
                             tickLine={false}
                             axisLine={false}
+                            tickFormatter={(value) => formatPercentRatio(value)}
                             label={{
                                 value: "变化率(%)",
                                 angle: 90,
@@ -120,11 +133,20 @@ export function ChartCard({
                             formatter={(value: number, name: string) => {
                                 if (name === "数值") {
                                     if (isPercentage) {
-                                        return [`${value.toFixed(2)}%`, name];
+                                        return [
+                                            formatPercentRatio(value),
+                                            name,
+                                        ];
                                     }
-                                    return [formatValue(value), name];
+                                    if (unit) {
+                                        return [
+                                            formatAmountByUnit(value, unit),
+                                            name,
+                                        ];
+                                    }
+                                    return [formatNumber(value), name];
                                 }
-                                return [`${value.toFixed(2)}%`, name];
+                                return [formatPercentRatio(value), name];
                             }}
                         />
                         <Legend

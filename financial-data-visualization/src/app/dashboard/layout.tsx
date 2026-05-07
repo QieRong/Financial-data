@@ -1,5 +1,6 @@
 import SidebarContainer from "./_components/SidebarContainer";
 import QueryProvider from "@/components/providers/query-provider"
+import { Suspense } from "react";
 
 export default function RootLayout({
     children,
@@ -7,6 +8,8 @@ export default function RootLayout({
     children: React.ReactNode;
 }) {
     return <QueryProvider>
-        <SidebarContainer>{children}</SidebarContainer>
+        <Suspense fallback={children}>
+            <SidebarContainer>{children}</SidebarContainer>
+        </Suspense>
     </QueryProvider>;
 }

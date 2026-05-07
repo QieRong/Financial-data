@@ -7,6 +7,7 @@ import { Suspense } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import { LoadingState } from "@/components/ui/loading-state";
 import { ChartCard } from "@/components/ui/chart-card";
+import { fetchReportData } from "@/app/dashboard/_components/analysis/report-data";
 import { formatPeriod, formatValue } from "@/app/lib/utils";
 import { RangeSelector } from "@/components/ui/range-selector";
 
@@ -28,59 +29,14 @@ interface NonOperatingData {
 }
 
 // 获取数据的函数
-const fetchPeriodData = async (stockCode: string): Promise<NonOperatingData[]> => {
-    const response = await fetch(
-        `/api/report/income/period/${stockCode}`,
-        {
-            headers: {
-                "Content-Type": "application/json",
-            },
-            credentials: "include",
-        }
-    );
+const fetchPeriodData = (stockCode: string): Promise<NonOperatingData[]> =>
+    fetchReportData<NonOperatingData>("income", "period", stockCode);
 
-    if (!response.ok) {
-        throw new Error("Network response was not ok");
-    }
+const fetchQuarterlyData = (stockCode: string): Promise<NonOperatingData[]> =>
+    fetchReportData<NonOperatingData>("income", "quarterly", stockCode);
 
-    return await response.json();
-};
-
-const fetchQuarterlyData = async (stockCode: string): Promise<NonOperatingData[]> => {
-    const response = await fetch(
-        `/api/report/income/quarterly/${stockCode}`,
-        {
-            headers: {
-                "Content-Type": "application/json",
-            },
-            credentials: "include",
-        }
-    );
-
-    if (!response.ok) {
-        throw new Error("Network response was not ok");
-    }
-
-    return await response.json();
-};
-
-const fetchYearlyData = async (stockCode: string): Promise<NonOperatingData[]> => {
-    const response = await fetch(
-        `/api/report/income/yearly/${stockCode}`,
-        {
-            headers: {
-                "Content-Type": "application/json",
-            },
-            credentials: "include",
-        }
-    );
-
-    if (!response.ok) {
-        throw new Error("Network response was not ok");
-    }
-
-    return await response.json();
-};
+const fetchYearlyData = (stockCode: string): Promise<NonOperatingData[]> =>
+    fetchReportData<NonOperatingData>("income", "yearly", stockCode);
 
 // 添加指标说明常量
 const METRIC_DESCRIPTIONS = {

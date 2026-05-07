@@ -39,6 +39,7 @@ async def root():
 async def get_financial_statement_report_period(stock_code: str):
     """获取资产负债表的报告期数据"""
     try:
+        stock_code = fix_stock_code(stock_code)
         data = calculate_financial_ratios(
             stock_code, "balance", aggregation="report_period"
         )
@@ -47,6 +48,8 @@ async def get_financial_statement_report_period(stock_code: str):
                 status_code=404, detail="No data found for the given stock code"
             )
         return data.to_dict(orient="records")
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -55,6 +58,7 @@ async def get_financial_statement_report_period(stock_code: str):
 async def get_income_statement_report_period(stock_code: str):
     """获取利润表的报告期数据"""
     try:
+        stock_code = fix_stock_code(stock_code)
         data = calculate_financial_ratios(
             stock_code, "income", aggregation="report_period"
         )
@@ -63,6 +67,8 @@ async def get_income_statement_report_period(stock_code: str):
                 status_code=404, detail="No data found for the given stock code"
             )
         return data.to_dict(orient="records")
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -71,6 +77,7 @@ async def get_income_statement_report_period(stock_code: str):
 async def get_cash_flow_statement_report_period(stock_code: str):
     """获取现金流量表的报告期数据"""
     try:
+        stock_code = fix_stock_code(stock_code)
         data = calculate_financial_ratios(
             stock_code, "cashflow", aggregation="report_period"
         )
@@ -79,6 +86,8 @@ async def get_cash_flow_statement_report_period(stock_code: str):
                 status_code=404, detail="No data found for the given stock code"
             )
         return data.to_dict(orient="records")
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -87,6 +96,7 @@ async def get_cash_flow_statement_report_period(stock_code: str):
 async def get_financial_statement_quarterly(stock_code: str):
     """获取资产负债表的季度数据"""
     try:
+        stock_code = fix_stock_code(stock_code)
         data = calculate_financial_ratios(
             stock_code, "balance", aggregation="quarterly"
         )
@@ -96,6 +106,8 @@ async def get_financial_statement_quarterly(stock_code: str):
                 detail="No quarterly data found for the given stock code",
             )
         return data.to_dict(orient="records")
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -104,6 +116,7 @@ async def get_financial_statement_quarterly(stock_code: str):
 async def get_income_statement_quarterly(stock_code: str):
     """获取利润表的季度数据"""
     try:
+        stock_code = fix_stock_code(stock_code)
         data = calculate_financial_ratios(stock_code, "income", aggregation="quarterly")
         if data.empty:
             raise HTTPException(
@@ -111,6 +124,8 @@ async def get_income_statement_quarterly(stock_code: str):
                 detail="No quarterly data found for the given stock code",
             )
         return data.to_dict(orient="records")
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -119,6 +134,7 @@ async def get_income_statement_quarterly(stock_code: str):
 async def get_cash_flow_statement_quarterly(stock_code: str):
     """获取现金流量表的季度数据"""
     try:
+        stock_code = fix_stock_code(stock_code)
         data = calculate_financial_ratios(
             stock_code, "cashflow", aggregation="quarterly"
         )
@@ -128,6 +144,8 @@ async def get_cash_flow_statement_quarterly(stock_code: str):
                 detail="No quarterly data found for the given stock code",
             )
         return data.to_dict(orient="records")
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -159,12 +177,15 @@ async def get_stock_name(stock_code: str):
 async def get_financial_statement_yearly(stock_code: str):
     """获取资产负债表的年度数据（使用第四季度数据）"""
     try:
+        stock_code = fix_stock_code(stock_code)
         data = calculate_financial_ratios(stock_code, "balance", aggregation="yearly")
         if data.empty:
             raise HTTPException(
                 status_code=404, detail="No yearly data found for the given stock code"
             )
         return data.to_dict(orient="records")
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -173,12 +194,15 @@ async def get_financial_statement_yearly(stock_code: str):
 async def get_income_statement_yearly(stock_code: str):
     """获取利润表的年度数据（使用第四季度数据）"""
     try:
+        stock_code = fix_stock_code(stock_code)
         data = calculate_financial_ratios(stock_code, "income", aggregation="yearly")
         if data.empty:
             raise HTTPException(
                 status_code=404, detail="No yearly data found for the given stock code"
             )
         return data.to_dict(orient="records")
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -187,12 +211,15 @@ async def get_income_statement_yearly(stock_code: str):
 async def get_cash_flow_statement_yearly(stock_code: str):
     """获取现金流量表的年数据（使用第四季度数据）"""
     try:
+        stock_code = fix_stock_code(stock_code)
         data = calculate_financial_ratios(stock_code, "cashflow", aggregation="yearly")
         if data.empty:
             raise HTTPException(
                 status_code=404, detail="No yearly data found for the given stock code"
             )
         return data.to_dict(orient="records")
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

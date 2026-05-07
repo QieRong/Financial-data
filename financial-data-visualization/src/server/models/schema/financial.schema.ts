@@ -39,6 +39,11 @@ export const report = pgTable(
         updatedAt: timestamp().defaultNow(),
     },
     (table) => [
+        index("idx_report_type_stock_period").on(
+            table.typeId,
+            table.stockCode,
+            table.periodType
+        ),
         index("idx_stock_date").on(table.stockCode, table.reportDate),
         index("idx_period_date").on(table.periodType, table.reportDate),
     ]

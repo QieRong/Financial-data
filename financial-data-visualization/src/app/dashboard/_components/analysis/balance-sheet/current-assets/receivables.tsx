@@ -8,6 +8,7 @@ import { ErrorBoundary } from "react-error-boundary";
 import { Suspense } from "react";
 import { LoadingState } from "@/components/ui/loading-state";
 import { ChartCard } from "@/components/ui/chart-card";
+import { fetchReportData } from "@/app/dashboard/_components/analysis/report-data";
 import { RangeSelector } from "@/components/ui/range-selector";
 
 import {
@@ -33,59 +34,14 @@ interface ReceivablesData {
 }
 
 // 获取数据的函数
-const fetchPeriodData = async (stockCode: string): Promise<ReceivablesData[]> => {
-    const response = await fetch(
-        `/api/report/balance/period/${stockCode}`,
-        {
-            headers: {
-                "Content-Type": "application/json",
-            },
-            credentials: "include",
-        }
-    );
+const fetchPeriodData = (stockCode: string): Promise<ReceivablesData[]> =>
+    fetchReportData<ReceivablesData>("balance", "period", stockCode);
 
-    if (!response.ok) {
-        throw new Error("Network response was not ok");
-    }
+const fetchQuarterlyData = (stockCode: string): Promise<ReceivablesData[]> =>
+    fetchReportData<ReceivablesData>("balance", "quarterly", stockCode);
 
-    return await response.json();
-};
-
-const fetchQuarterlyData = async (stockCode: string): Promise<ReceivablesData[]> => {
-    const response = await fetch(
-        `/api/report/balance/quarterly/${stockCode}`,
-        {
-            headers: {
-                "Content-Type": "application/json",
-            },
-            credentials: "include",
-        }
-    );
-
-    if (!response.ok) {
-        throw new Error("Network response was not ok");
-    }
-
-    return await response.json();
-};
-
-const fetchYearlyData = async (stockCode: string): Promise<ReceivablesData[]> => {
-    const response = await fetch(
-        `/api/report/balance/yearly/${stockCode}`,
-        {
-            headers: {
-                "Content-Type": "application/json",
-            },
-            credentials: "include",
-        }
-    );
-
-    if (!response.ok) {
-        throw new Error("Network response was not ok");
-    }
-
-    return await response.json();
-};
+const fetchYearlyData = (stockCode: string): Promise<ReceivablesData[]> =>
+    fetchReportData<ReceivablesData>("balance", "yearly", stockCode);
 
 // 添加指标说明常量
 const METRIC_DESCRIPTIONS = {
@@ -271,6 +227,7 @@ function ReceivablesContent() {
                     <TabsContent value="receivables">
                         <ChartCard
                             data={getData("receivables")}
+                            unit="次"
                             showMoM={dataType === "quarterly"}
                             rotateLabel
                         />
@@ -280,6 +237,7 @@ function ReceivablesContent() {
                     <TabsContent value="inventory">
                         <ChartCard
                             data={getData("inventory")}
+                            unit="次"
                             showMoM={dataType === "quarterly"}
                             rotateLabel
                         />
@@ -289,6 +247,7 @@ function ReceivablesContent() {
                     <TabsContent value="fixed-assets">
                         <ChartCard
                             data={getData("fixed-assets")}
+                            unit="次"
                             showMoM={dataType === "quarterly"}
                             rotateLabel
                         />

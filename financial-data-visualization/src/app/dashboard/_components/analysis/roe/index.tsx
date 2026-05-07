@@ -8,6 +8,7 @@ import { ErrorBoundary } from "react-error-boundary";
 import { Suspense } from "react";
 import { LoadingState } from "@/components/ui/loading-state";
 import { ChartCard } from "@/components/ui/chart-card";
+import { fetchReportData } from "@/app/dashboard/_components/analysis/report-data";
 import { RangeSelector } from "@/components/ui/range-selector";
 
 import {
@@ -42,59 +43,14 @@ interface ROEData {
 }
 
 // 获取数据的函数
-const fetchPeriodData = async (stockCode: string): Promise<ROEData[]> => {
-    const response = await fetch(
-        `/api/report/income/period/${stockCode}`,
-        {
-            headers: {
-                "Content-Type": "application/json",
-            },
-            credentials: "include",
-        }
-    );
+const fetchPeriodData = (stockCode: string): Promise<ROEData[]> =>
+    fetchReportData<ROEData>("income", "period", stockCode);
 
-    if (!response.ok) {
-        throw new Error("Network response was not ok");
-    }
+const fetchQuarterlyData = (stockCode: string): Promise<ROEData[]> =>
+    fetchReportData<ROEData>("income", "quarterly", stockCode);
 
-    return await response.json();
-};
-
-const fetchQuarterlyData = async (stockCode: string): Promise<ROEData[]> => {
-    const response = await fetch(
-        `/api/report/income/quarterly/${stockCode}`,
-        {
-            headers: {
-                "Content-Type": "application/json",
-            },
-            credentials: "include",
-        }
-    );
-
-    if (!response.ok) {
-        throw new Error("Network response was not ok");
-    }
-
-    return await response.json();
-};
-
-const fetchYearlyData = async (stockCode: string): Promise<ROEData[]> => {
-    const response = await fetch(
-        `/api/report/income/yearly/${stockCode}`,
-        {
-            headers: {
-                "Content-Type": "application/json",
-            },
-            credentials: "include",
-        }
-    );
-
-    if (!response.ok) {
-        throw new Error("Network response was not ok");
-    }
-
-    return await response.json();
-};
+const fetchYearlyData = (stockCode: string): Promise<ROEData[]> =>
+    fetchReportData<ROEData>("income", "yearly", stockCode);
 
 // 添加指标说明常量
 const METRIC_DESCRIPTIONS = {
@@ -352,6 +308,7 @@ function ROEContent() {
                     <TabsContent value="assetTurnover">
                         <ChartCard
                             data={getData("assetTurnover")}
+                            unit="次"
                             showMoM={dataType === "quarterly"}
                             rotateLabel
                         />
@@ -361,6 +318,7 @@ function ROEContent() {
                     <TabsContent value="leverage">
                         <ChartCard
                             data={getData("leverage")}
+                            unit="倍"
                             showMoM={dataType === "quarterly"}
                             rotateLabel
                         />

@@ -1,6 +1,10 @@
 import { TrendingUp, TrendingDown } from "lucide-react";
 import { TrendLabel } from "./trend-label";
-import { formatAmount } from "@/app/lib/utils";
+import {
+    formatAmountByUnit,
+    formatNumber,
+    formatPercentRatio,
+} from "./chart-format";
 
 interface DataSummaryProps {
     data: Array<{
@@ -10,7 +14,7 @@ interface DataSummaryProps {
         同比: number;
     }>;
     isPercentage?: boolean;
-    unit?: "亿" | "万";
+    unit?: "亿" | "万" | "次" | "倍";
     invertColors?: boolean;
     showMoM?: boolean;
 }
@@ -25,7 +29,7 @@ export function DataSummary({
     const latestData = data[data.length - 1];
     const previousData = data[data.length - 2];
 
-    if (!latestData?.value || !previousData?.value) {
+    if (!latestData || !previousData) {
         return (
             <div className="mt-4 p-3 border rounded-lg bg-slate-50">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -43,18 +47,18 @@ export function DataSummary({
     }
 
     const valueChange =
-        ((latestData.value - previousData.value) / previousData.value) * 100;
+        previousData.value === 0
+            ? 0
+            : (latestData.value - previousData.value) / previousData.value;
 
     const formatValue = (value: number) => {
         if (isPercentage) {
-            return `${value.toFixed(2)}%`;
+            return formatPercentRatio(value);
         }
         if (unit) {
-            const absValue = Math.abs(value);
-            const formattedAbsValue = formatAmount(absValue);
-            return value < 0 ? `-${formattedAbsValue}` : formattedAbsValue;
+            return formatAmountByUnit(value, unit);
         }
-        return value.toFixed(2);
+        return formatNumber(value);
     };
 
     return (
@@ -76,7 +80,7 @@ export function DataSummary({
                             }`}
                         >
                             ({valueChange >= 0 ? "+" : ""}
-                            {valueChange.toFixed(2)}%)
+                            {formatPercentRatio(valueChange)})
                             {valueChange >= 0 ? (
                                 <TrendingUp className="h-3 w-3 ml-1" />
                             ) : (

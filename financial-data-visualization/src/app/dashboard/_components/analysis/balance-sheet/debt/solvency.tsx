@@ -8,6 +8,7 @@ import { ErrorBoundary } from "react-error-boundary";
 import { Suspense } from "react";
 import { LoadingState } from "@/components/ui/loading-state";
 import { ChartCard } from "@/components/ui/chart-card";
+import { fetchReportData } from "@/app/dashboard/_components/analysis/report-data";
 import { RangeSelector } from "@/components/ui/range-selector";
 
 import {
@@ -30,59 +31,14 @@ interface SolvencyData {
 }
 
 // 获取数据的函数
-const fetchPeriodData = async (stockCode: string): Promise<SolvencyData[]> => {
-    const response = await fetch(
-        `/api/report/balance/period/${stockCode}`,
-        {
-            headers: {
-                "Content-Type": "application/json",
-            },
-            credentials: "include",
-        }
-    );
+const fetchPeriodData = (stockCode: string): Promise<SolvencyData[]> =>
+    fetchReportData<SolvencyData>("balance", "period", stockCode);
 
-    if (!response.ok) {
-        throw new Error("Network response was not ok");
-    }
+const fetchQuarterlyData = (stockCode: string): Promise<SolvencyData[]> =>
+    fetchReportData<SolvencyData>("balance", "quarterly", stockCode);
 
-    return await response.json();
-};
-
-const fetchQuarterlyData = async (stockCode: string): Promise<SolvencyData[]> => {
-    const response = await fetch(
-        `/api/report/balance/quarterly/${stockCode}`,
-        {
-            headers: {
-                "Content-Type": "application/json",
-            },
-            credentials: "include",
-        }
-    );
-
-    if (!response.ok) {
-        throw new Error("Network response was not ok");
-    }
-
-    return await response.json();
-};
-
-const fetchYearlyData = async (stockCode: string): Promise<SolvencyData[]> => {
-    const response = await fetch(
-        `/api/report/balance/yearly/${stockCode}`,
-        {
-            headers: {
-                "Content-Type": "application/json",
-            },
-            credentials: "include",
-        }
-    );
-
-    if (!response.ok) {
-        throw new Error("Network response was not ok");
-    }
-
-    return await response.json();
-};
+const fetchYearlyData = (stockCode: string): Promise<SolvencyData[]> =>
+    fetchReportData<SolvencyData>("balance", "yearly", stockCode);
 
 // 添加指标说明常量
 const METRIC_DESCRIPTIONS = {

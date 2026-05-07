@@ -56,6 +56,7 @@ pip install fastapi uvicorn akshare pandas
 2. 用记事本打开它，确保里面的内容是：
    ```env
    DATABASE_URL=postgresql://postgres:123456@localhost:5432/financial
+   REPORT_API_BASE_URL=http://127.0.0.1:8000
    ```
    *(如果你的数据库密码不是123456，请在这里改掉)*。
 

@@ -1,0 +1,107 @@
+{
+  "version": 1,
+  "skills": {
+    "ckm:banner-design": {
+      "source": "nextlevelbuilder/ui-ux-pro-max-skill",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/banner-design/SKILL.md",
+      "computedHash": "2237d5aafec7ab0223a91a9c4a13a8d25a4bd8a29b4ae9f9ea74d2cbfb9c6f91"
+    },
+    "ckm:brand": {
+      "source": "nextlevelbuilder/ui-ux-pro-max-skill",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/brand/SKILL.md",
+      "computedHash": "a5f623ca3998b832a4a254426bc184479bf1cfbf4275b786a6319d014d06803c"
+    },
+    "ckm:design": {
+      "source": "nextlevelbuilder/ui-ux-pro-max-skill",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/design/SKILL.md",
+      "computedHash": "356a9ffc8ae2174dee4ac0b35458b383756e349dfa00de17b79394154cc99905"
+    },
+    "ckm:design-system": {
+      "source": "nextlevelbuilder/ui-ux-pro-max-skill",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/design-system/SKILL.md",
+      "computedHash": "0206bc1d866ba6a93c6683d28b801314979fd164939d53830a7592ce0fb7a8a2"
+    },
+    "ckm:slides": {
+      "source": "nextlevelbuilder/ui-ux-pro-max-skill",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/slides/SKILL.md",
+      "computedHash": "f3e6594f5dd3f341afbd2b6c71d8b7cc44a97cdb85f76d5868b715f650c97ac2"
+    },
+    "ckm:ui-styling": {
+      "source": "nextlevelbuilder/ui-ux-pro-max-skill",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/ui-styling/SKILL.md",
+      "computedHash": "b5f892864e479f969820c353f44faeedc61981bf2d7a854367069a80e0a264e1"
+    },
+    "competitive-analysis": {
+      "source": "anthropics/financial-services-plugins",
+      "sourceType": "github",
+      "skillPath": "plugins/vertical-plugins/financial-analysis/skills/competitive-analysis/SKILL.md",
+      "computedHash": "8382466193d26a55e5dd5becbf49ef84ee9c014c9b661a05396f7d44ddfce7a6"
+    },
+    "datapack-builder": {
+      "source": "anthropics/financial-services-plugins",
+      "sourceType": "github",
+      "skillPath": "plugins/vertical-plugins/investment-banking/skills/datapack-builder/SKILL.md",
+      "computedHash": "a9d2353291b8170629ee191133774a75f5034c702213f3f3a1743622359e7b17"
+    },
+    "design-md": {
+      "source": "google-labs-code/stitch-skills",
+      "sourceType": "github",
+      "skillPath": "skills/design-md/SKILL.md",
+      "computedHash": "44af3e6e89a42a765d9cebf943f1e2ff3cdf43d1958341eb43fb7b74116f6691"
+    },
+    "financial-analysis-agent": {
+      "source": "qodex-ai/ai-agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/financial-analysis-agent/SKILL.md",
+      "computedHash": "4eea5d808d7df97ed17ec41bfa8643283c2dd1e619c5387a8633391cd258cf78"
+    },
+    "financial-data-analysis": {
+      "source": "kirkluokun/awesome-a-stock-openclawskills",
+      "sourceType": "github",
+      "skillPath": "data-时间序列分析/SKILL.md",
+      "computedHash": "4ee3a41dafed05a2859bfd18b5e121a13e9be9a232e31f132c628381b74a8ea3"
+    },
+    "financial-statements": {
+      "source": "anthropics/knowledge-work-plugins",
+      "sourceType": "github",
+      "skillPath": "finance/skills/financial-statements/SKILL.md",
+      "computedHash": "a1d47e9fe416526233ba65dc2d6794332aa7d14d9e3d2f9fc0832f40f96c152d"
+    },
+    "frontend-design": {
+      "source": "anthropics/skills",
+      "sourceType": "github",
+      "skillPath": "skills/frontend-design/SKILL.md",
+      "computedHash": "516bd2154eb843a8240e43d5b285229129853114ad7075a5e141e1c08e408c84"
+    },
+    "ppt-template-creator": {
+      "source": "anthropics/financial-services-plugins",
+      "sourceType": "github",
+      "skillPath": "plugins/vertical-plugins/financial-analysis/skills/ppt-template-creator/SKILL.md",
+      "computedHash": "9a5b08d0154143118030984b3745f93d1abda6d78a827aa46d51c79050ec3f46"
+    },
+    "pptx": {
+      "source": "anthropics/skills",
+      "sourceType": "github",
+      "skillPath": "skills/pptx/SKILL.md",
+      "computedHash": "2275e4d8dba1790d52f6619b3e2fed04edc948beef545a2ad18e4a1be644426d"
+    },
+    "pragmatic-programmer": {
+      "source": "wondelai/skills",
+      "sourceType": "github",
+      "skillPath": "pragmatic-programmer/SKILL.md",
+      "computedHash": "90e3cf5b6fb40d233496d1fa2a36ed452fef382aab0060d55a01848f7e0f4a95"
+    },
+    "ui-ux-pro-max": {
+      "source": "nextlevelbuilder/ui-ux-pro-max-skill",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/ui-ux-pro-max/SKILL.md",
+      "computedHash": "6337038fe1fe6bbe1b9f252ab678ee575859190bab6f0f246f4061824eb40875"
+    }
+  }
+}
